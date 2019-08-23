@@ -45,6 +45,8 @@ public class KafkaSourceConnectorTest extends EasyMockSupport {
   private static final String POLL_LOOP_TIMEOUT_MS_VALUE = "2000";
   private static final String TOPIC_LIST_TIMEOUT_MS_VALUE = "5000";
   private static final String CONSUMER_GROUP_ID_VALUE = "test-consumer-group";
+  private static final String SOURCE_KEY_CONVERTER_VALUE = "org.apache.kafka.connect.storage.StringConverter";
+  private static final String SOURCE_VALUE_CONVERTER_VALUE = "org.apache.kafka.connect.storage.StringConverter";
 
   private PartitionMonitor partitionMonitorMock;
   private ConnectorContext connectorContextMock;
@@ -66,6 +68,8 @@ public class KafkaSourceConnectorTest extends EasyMockSupport {
     sourceProperties.put(KafkaSourceConnectorConfig.POLL_LOOP_TIMEOUT_MS_CONFIG, POLL_LOOP_TIMEOUT_MS_VALUE);
     sourceProperties.put(KafkaSourceConnectorConfig.TOPIC_LIST_TIMEOUT_MS_CONFIG, TOPIC_LIST_TIMEOUT_MS_VALUE);
     sourceProperties.put(KafkaSourceConnectorConfig.CONSUMER_GROUP_ID_CONFIG, CONSUMER_GROUP_ID_VALUE);
+    sourceProperties.put(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_CONFIG, SOURCE_KEY_CONVERTER_VALUE);
+    sourceProperties.put(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_CONFIG, SOURCE_VALUE_CONVERTER_VALUE);
 
 
     // Default leader topic partitions to return (just one)

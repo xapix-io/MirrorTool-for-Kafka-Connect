@@ -61,6 +61,9 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
 
   public static final String TASK_PREFIX = "task.";
 
+  public static final String SOURCE_KEY_CONVERTER_PREFIX = "source.key.converter.";
+  public static final String SOUCRE_VALUE_CONVERTER_PREFIX = "source.value.converter.";
+
   // Topic partition list we send to each task. Not user configurable.
   public static final String TASK_LEADER_TOPIC_PARTITION_CONFIG = TASK_PREFIX.concat("leader.topic.partitions");
 
@@ -135,36 +138,58 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
   public static final String CONSUMER_GROUP_ID_DOC = "Source Kafka Consumer group id. This must be set if source.enable.auto.commit is set as a group id is required for offset tracking on the source cluster";
   public static final Object CONSUMER_GROUP_ID_DEFAULT = ConfigDef.NO_DEFAULT_VALUE;
 
+  public static final String SOURCE_KEY_CONVERTER_CONFIG = "source.key.converter";
+  public static final String SOURCE_KEY_CONVERTER_DOC = "";
+
+  public static final String SOURCE_VALUE_CONVERTER_CONFIG = "source.value.converter";
+  public static final String SOURCE_VALUE_CONVERTER_DOC = "";
+
+    public static final String SOURCE_KEY_CONVERTER_TOPIC_CONFIG = SOURCE_KEY_CONVERTER_PREFIX.concat("topic");
+    public static final String SOURCE_KEY_CONVERTER_TOPIC_DOC = "";
+    public static final String SOURCE_KEY_CONVERTER_TOPIC_DEFAULT = "";
+
+    public static final String SOURCE_VALUE_CONVERTER_TOPIC_CONFIG = SOUCRE_VALUE_CONVERTER_PREFIX.concat("topic");
+    public static final String SOURCE_VALUE_CONVERTER_TOPIC_DOC = "";
+    public static final String SOURCE_VALUE_CONVERTER_TOPIC_DEFAULT = "";
+
   // Config definition
   public static final ConfigDef CONFIG = new ConfigDef()
       .define(SOURCE_TOPIC_WHITELIST_CONFIG, Type.STRING, SOURCE_TOPIC_WHITELIST_DEFAULT,
           TOPIC_WHITELIST_REGEX_VALIDATOR, Importance.HIGH, SOURCE_TOPIC_WHITELIST_DOC)
-      .define(INCLUDE_MESSAGE_HEADERS_CONFIG, Type.BOOLEAN, INCLUDE_MESSAGE_HEADERS_DEFAULT, 
+      .define(INCLUDE_MESSAGE_HEADERS_CONFIG, Type.BOOLEAN, INCLUDE_MESSAGE_HEADERS_DEFAULT,
           Importance.MEDIUM, INCLUDE_MESSAGE_HEADERS_DOC)
-      .define(TOPIC_LIST_TIMEOUT_MS_CONFIG, Type.INT, TOPIC_LIST_TIMEOUT_MS_DEFAULT, 
+      .define(TOPIC_LIST_TIMEOUT_MS_CONFIG, Type.INT, TOPIC_LIST_TIMEOUT_MS_DEFAULT,
           Importance.LOW,TOPIC_LIST_TIMEOUT_MS_DOC)
-      .define(TOPIC_LIST_POLL_INTERVAL_MS_CONFIG, Type.INT, TOPIC_LIST_POLL_INTERVAL_MS_DEFAULT, 
+      .define(TOPIC_LIST_POLL_INTERVAL_MS_CONFIG, Type.INT, TOPIC_LIST_POLL_INTERVAL_MS_DEFAULT,
           Importance.MEDIUM, TOPIC_LIST_POLL_INTERVAL_MS_DOC)
       .define(RECONFIGURE_TASKS_ON_LEADER_CHANGE_CONFIG, Type.BOOLEAN, RECONFIGURE_TASKS_ON_LEADER_CHANGE_DEFAULT,
           Importance.MEDIUM, RECONFIGURE_TASKS_ON_LEADER_CHANGE_DOC)
-      .define(POLL_LOOP_TIMEOUT_MS_CONFIG, Type.INT, POLL_LOOP_TIMEOUT_MS_DEFAULT, 
+      .define(POLL_LOOP_TIMEOUT_MS_CONFIG, Type.INT, POLL_LOOP_TIMEOUT_MS_DEFAULT,
           Importance.LOW, POLL_LOOP_TIMEOUT_MS_DOC)
-      .define(MAX_SHUTDOWN_WAIT_MS_CONFIG, Type.INT, MAX_SHUTDOWN_WAIT_MS_DEFAULT, 
+      .define(MAX_SHUTDOWN_WAIT_MS_CONFIG, Type.INT, MAX_SHUTDOWN_WAIT_MS_DEFAULT,
           Importance.LOW, MAX_SHUTDOWN_WAIT_MS_DOC)
       .define(SOURCE_BOOTSTRAP_SERVERS_CONFIG, Type.LIST, SOURCE_BOOTSTRAP_SERVERS_DEFAULT, NON_EMPTY_LIST_VALIDATOR,
           Importance.HIGH, SOURCE_BOOTSTRAP_SERVERS_DOC)
-      .define(CONSUMER_MAX_POLL_RECORDS_CONFIG, Type.INT, CONSUMER_MAX_POLL_RECORDS_DEFAULT, 
+      .define(CONSUMER_MAX_POLL_RECORDS_CONFIG, Type.INT, CONSUMER_MAX_POLL_RECORDS_DEFAULT,
           Importance.LOW, CONSUMER_MAX_POLL_RECORDS_DOC)
-      .define(CONSUMER_AUTO_OFFSET_RESET_CONFIG, Type.STRING, CONSUMER_AUTO_OFFSET_RESET_DEFAULT, CONSUMER_AUTO_OFFSET_RESET_VALIDATOR, 
+      .define(CONSUMER_AUTO_OFFSET_RESET_CONFIG, Type.STRING, CONSUMER_AUTO_OFFSET_RESET_DEFAULT, CONSUMER_AUTO_OFFSET_RESET_VALIDATOR,
           Importance.MEDIUM, CONSUMER_AUTO_OFFSET_RESET_DOC)
-      .define(CONSUMER_KEY_DESERIALIZER_CONFIG, Type.STRING, CONSUMER_KEY_DESERIALIZER_DEFAULT, 
+      .define(CONSUMER_KEY_DESERIALIZER_CONFIG, Type.STRING, CONSUMER_KEY_DESERIALIZER_DEFAULT,
           Importance.LOW, CONSUMER_KEY_DESERIALIZER_DOC)
-      .define(CONSUMER_VALUE_DESERIALIZER_CONFIG, Type.STRING, CONSUMER_VALUE_DESERIALIZER_DEFAULT, 
+      .define(CONSUMER_VALUE_DESERIALIZER_CONFIG, Type.STRING, CONSUMER_VALUE_DESERIALIZER_DEFAULT,
           Importance.LOW, CONSUMER_VALUE_DESERIALIZER_DOC)
-      .define(CONSUMER_ENABLE_AUTO_COMMIT_CONFIG, Type.BOOLEAN, CONSUMER_ENABLE_AUTO_COMMIT_DEFAULT, 
+      .define(CONSUMER_ENABLE_AUTO_COMMIT_CONFIG, Type.BOOLEAN, CONSUMER_ENABLE_AUTO_COMMIT_DEFAULT,
           Importance.LOW, CONSUMER_ENABLE_AUTO_COMMIT_DOC)
       .define(CONSUMER_GROUP_ID_CONFIG, Type.STRING, CONSUMER_GROUP_ID_DEFAULT, new ConfigDef.NonEmptyString(),
-          Importance.MEDIUM, CONSUMER_GROUP_ID_DOC);
+          Importance.MEDIUM, CONSUMER_GROUP_ID_DOC)
+      .define(SOURCE_KEY_CONVERTER_CONFIG, Type.STRING,
+          Importance.HIGH, SOURCE_KEY_CONVERTER_DOC)
+      .define(SOURCE_VALUE_CONVERTER_CONFIG, Type.STRING,
+          Importance.HIGH, SOURCE_VALUE_CONVERTER_DOC)
+      .define(SOURCE_KEY_CONVERTER_TOPIC_CONFIG, Type.STRING, SOURCE_KEY_CONVERTER_TOPIC_DEFAULT,
+          Importance.HIGH, SOURCE_KEY_CONVERTER_TOPIC_DOC)
+      .define(SOURCE_VALUE_CONVERTER_TOPIC_CONFIG, Type.STRING, SOURCE_VALUE_CONVERTER_TOPIC_DEFAULT,
+          Importance.HIGH, SOURCE_VALUE_CONVERTER_TOPIC_DOC);
 
   public KafkaSourceConnectorConfig(Map<String, String> props) {
     super(CONFIG, props);
@@ -231,6 +256,16 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
     // But override with anything under CONSUMER_PREFIX
     kafkaConsumerProps.putAll(allWithPrefix(CONSUMER_PREFIX));
     return kafkaConsumerProps;
+  }
+
+  // Return a Properties Object that can be passed to org.apache.kafka.connect.storage.Converter
+    public Map<String, Object> getSourceKeyConverterProperties() {
+      return allWithPrefix(SOURCE_KEY_CONVERTER_PREFIX, true);
+  }
+
+  // Return a Properties Object that can be passed to org.apache.kafka.connect.storage.Converter
+    public Map<String, Object> getSourceValueConverterProperties() {
+      return allWithPrefix(SOUCRE_VALUE_CONVERTER_PREFIX, true);
   }
 
   public Pattern getTopicWhitelistPattern() {

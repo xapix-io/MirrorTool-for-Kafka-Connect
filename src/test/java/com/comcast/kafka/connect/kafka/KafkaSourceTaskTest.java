@@ -70,6 +70,8 @@ public class KafkaSourceTaskTest {
   private static final String SECOND_TOPIC = "another.test.topic";
   private static final int SECOND_PARTITION = 0;
   private static final long SECOND_OFFSET = 456L;
+  private static final String SOURCE_KEY_CONVERTER_VALUE = "org.apache.kafka.connect.storage.StringConverter";
+  private static final String SOURCE_VALUE_CONVERTER_VALUE = "org.apache.kafka.connect.storage.StringConverter";
 
   private KafkaSourceTask objectUnderTest;
   private Map<String, String> opts;
@@ -91,6 +93,8 @@ public class KafkaSourceTaskTest {
     opts.put(KafkaSourceConnectorConfig.TASK_LEADER_TOPIC_PARTITION_CONFIG, TASK_LEADER_TOPIC_PARTITION_VALUE);
     opts.put(KafkaSourceConnectorConfig.CONSUMER_AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET_VALUE);
     opts.put(KafkaSourceConnectorConfig.CONSUMER_GROUP_ID_CONFIG, CONSUMER_GROUP_ID_VALUE);
+    opts.put(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_CONFIG, SOURCE_KEY_CONVERTER_VALUE);
+    opts.put(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_CONFIG, SOURCE_VALUE_CONVERTER_VALUE);
 
     config = new KafkaSourceConnectorConfig(opts);
 

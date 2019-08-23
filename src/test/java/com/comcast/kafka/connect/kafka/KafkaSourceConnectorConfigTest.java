@@ -31,6 +31,8 @@ public class KafkaSourceConnectorConfigTest {
     map.put(KafkaSourceConnectorConfig.SOURCE_TOPIC_WHITELIST_CONFIG, "test.topic");
     map.put(KafkaSourceConnectorConfig.SOURCE_BOOTSTRAP_SERVERS_CONFIG, "localhost:6000");
     map.put(KafkaSourceConnectorConfig.CONSUMER_GROUP_ID_CONFIG, "test-consumer-group");
+    map.put(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_CONFIG, "org.apache.kafka.connect.storage.StringConverter");
+    map.put(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_CONFIG, "org.apache.kafka.connect.storage.StringConverter");
     defaultMap = Collections.unmodifiableMap(map);
   }
 

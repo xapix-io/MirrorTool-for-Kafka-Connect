@@ -25,6 +25,7 @@ import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.header.ConnectHeaders;
 import org.apache.kafka.connect.source.SourceTask;
 import org.apache.kafka.connect.source.SourceRecord;
+import org.apache.kafka.connect.storage.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +65,34 @@ public class KafkaSourceTask extends SourceTask {
   // Consumer
   private KafkaConsumer<byte[], byte[]> consumer;
 
+  // Source converters
+  private Converter sourceKeyConverter;
+  private String sourceKeyConverterTopic;
+  private Converter sourceValueConverter;
+  private String sourceValueConverterTopic;
+
   public void start(Map<String, String> opts) {
     logger.info("{}: task is starting.", this);
     KafkaSourceConnectorConfig sourceConnectorConfig = new KafkaSourceConnectorConfig(opts);
     maxShutdownWait = sourceConnectorConfig.getInt(KafkaSourceConnectorConfig.MAX_SHUTDOWN_WAIT_MS_CONFIG);
     pollTimeout = sourceConnectorConfig.getInt(KafkaSourceConnectorConfig.POLL_LOOP_TIMEOUT_MS_CONFIG);
     includeHeaders = sourceConnectorConfig.getBoolean(KafkaSourceConnectorConfig.INCLUDE_MESSAGE_HEADERS_CONFIG);
+    try {
+        sourceKeyConverter = (Converter) Class.forName(sourceConnectorConfig.getString(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_CONFIG)).newInstance();
+    } catch (Exception e) {
+        logger.error("{}: Can not load class for Key Converter", this);
+        return;
+    }
+    sourceKeyConverter.configure(sourceConnectorConfig.getSourceKeyConverterProperties(), false);
+    sourceKeyConverterTopic = sourceConnectorConfig.getString(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_TOPIC_CONFIG);
+    try {
+        sourceValueConverter = (Converter) Class.forName(sourceConnectorConfig.getString(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_CONFIG)).newInstance();
+    } catch (Exception e) {
+        logger.error("{}: Can not load class for Value Converter", this);
+        return;
+    }
+    sourceValueConverter.configure(sourceConnectorConfig.getSourceValueConverterProperties(), false);
+    sourceValueConverterTopic = sourceConnectorConfig.getString(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_TOPIC_CONFIG);
     String unknownOffsetResetPosition = sourceConnectorConfig
         .getString(KafkaSourceConnectorConfig.CONSUMER_AUTO_OFFSET_RESET_CONFIG);
 
@@ -165,8 +188,8 @@ public class KafkaSourceTask extends SourceTask {
           Map<String, Long> sourceOffset = Collections.singletonMap(OFFSET_KEY, krecord.offset());
           String sourceTopic = krecord.topic();
           String destinationTopic = sourceTopic;
-          byte[] recordKey = krecord.key();
-          byte[] recordValue = krecord.value();
+          Object recordKey = sourceKeyConverter.toConnectData(sourceKeyConverterTopic, krecord.key());
+          Object recordValue = sourceValueConverter.toConnectData(sourceValueConverterTopic, krecord.value());
           long recordTimestamp = krecord.timestamp();
           if (logger.isDebugEnabled()) {
             logger.trace(
