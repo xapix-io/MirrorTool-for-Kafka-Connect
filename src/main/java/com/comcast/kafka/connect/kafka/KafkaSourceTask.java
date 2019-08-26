@@ -21,6 +21,7 @@ import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.SchemaAndValue;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.header.ConnectHeaders;
 import org.apache.kafka.connect.source.SourceTask;
@@ -188,8 +189,8 @@ public class KafkaSourceTask extends SourceTask {
           Map<String, Long> sourceOffset = Collections.singletonMap(OFFSET_KEY, krecord.offset());
           String sourceTopic = krecord.topic();
           String destinationTopic = sourceTopic;
-          Object recordKey = sourceKeyConverter.toConnectData(sourceKeyConverterTopic, krecord.key());
-          Object recordValue = sourceValueConverter.toConnectData(sourceValueConverterTopic, krecord.value());
+          SchemaAndValue recordKey = sourceKeyConverter.toConnectData(sourceKeyConverterTopic, krecord.key());
+          SchemaAndValue recordValue = sourceValueConverter.toConnectData(sourceValueConverterTopic, krecord.value());
           long recordTimestamp = krecord.timestamp();
           if (logger.isDebugEnabled()) {
             logger.trace(
@@ -207,12 +208,11 @@ public class KafkaSourceTask extends SourceTask {
                 destinationHeaders.add(header.key(), header.value(), Schema.OPTIONAL_BYTES_SCHEMA);
               }
             }
-            records.add(
-                new SourceRecord(sourcePartition, sourceOffset, destinationTopic, null, Schema.OPTIONAL_BYTES_SCHEMA,
-                    recordKey, Schema.OPTIONAL_BYTES_SCHEMA, recordValue, recordTimestamp, destinationHeaders));
+            records.add(new SourceRecord(sourcePartition, sourceOffset, destinationTopic, null, recordKey.schema(),
+                                         recordKey.value(), recordValue.schema(), recordValue.value(), recordTimestamp, destinationHeaders));
           } else {
-            records.add(new SourceRecord(sourcePartition, sourceOffset, destinationTopic, null,
-                Schema.OPTIONAL_BYTES_SCHEMA, recordKey, Schema.OPTIONAL_BYTES_SCHEMA, recordValue, recordTimestamp));
+            records.add(new SourceRecord(sourcePartition, sourceOffset, destinationTopic, null, recordKey.schema(),
+                                         recordKey.value(), recordValue.schema(), recordValue.value(), recordTimestamp));
           }
         }
       } catch (WakeupException e) {
