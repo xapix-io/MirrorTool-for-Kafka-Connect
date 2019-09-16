@@ -127,12 +127,6 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
       .concat(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG);
   public static final String CONSUMER_VALUE_DESERIALIZER_DOC = "Value deserializer to use for the kafka consumers connecting to the source cluster.";
   public static final String CONSUMER_VALUE_DESERIALIZER_DEFAULT = ByteArrayDeserializer.class.getName();
-  public static final String CONSUMER_ENABLE_AUTO_COMMIT_CONFIG = SOURCE_PREFIX
-      .concat(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG);
-  public static final String CONSUMER_ENABLE_AUTO_COMMIT_DOC = "If true the consumer's offset will be periodically committed to the source cluster in the background. "
-      + "Note that these offsets are not used to resume the connector (They are stored in the Kafka Connect offset store), but may be useful in monitoring the current offset lag "
-      + "of this connector on the source cluster";
-  public static final Boolean CONSUMER_ENABLE_AUTO_COMMIT_DEFAULT = true;
 
   public static final String SOURCE_KEY_CONVERTER_CONFIG = "source.key.converter";
   public static final String SOURCE_KEY_CONVERTER_DOC = "";
@@ -174,8 +168,6 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
           Importance.LOW, CONSUMER_KEY_DESERIALIZER_DOC)
       .define(CONSUMER_VALUE_DESERIALIZER_CONFIG, Type.STRING, CONSUMER_VALUE_DESERIALIZER_DEFAULT,
           Importance.LOW, CONSUMER_VALUE_DESERIALIZER_DOC)
-      .define(CONSUMER_ENABLE_AUTO_COMMIT_CONFIG, Type.BOOLEAN, CONSUMER_ENABLE_AUTO_COMMIT_DEFAULT,
-          Importance.LOW, CONSUMER_ENABLE_AUTO_COMMIT_DOC)
       .define(SOURCE_KEY_CONVERTER_CONFIG, Type.STRING,
           Importance.HIGH, SOURCE_KEY_CONVERTER_DOC)
       .define(SOURCE_VALUE_CONVERTER_CONFIG, Type.STRING,
