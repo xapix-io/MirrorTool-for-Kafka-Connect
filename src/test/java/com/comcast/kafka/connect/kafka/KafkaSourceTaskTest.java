@@ -63,7 +63,6 @@ public class KafkaSourceTaskTest {
   private static final String TASK_LEADER_TOPIC_PARTITION_VALUE = "0:test.topic:1";
   private static final String AUTO_OFFSET_RESET_VALUE = "latest";
   private static final String SOURCE_TOPICS_WHITELIST_VALUE = "test*";
-  private static final String CONSUMER_GROUP_ID_VALUE = "test-consumer-group";
   private static final String FIRST_TOPIC = "test.topic";
   private static final int FIRST_PARTITION = 1;
   private static final long FIRST_OFFSET = 123L;
@@ -92,7 +91,6 @@ public class KafkaSourceTaskTest {
     opts.put(KafkaSourceConnectorConfig.SOURCE_BOOTSTRAP_SERVERS_CONFIG, SOURCE_BOOTSTRAP_SERVERS_VALUE);
     opts.put(KafkaSourceConnectorConfig.TASK_LEADER_TOPIC_PARTITION_CONFIG, TASK_LEADER_TOPIC_PARTITION_VALUE);
     opts.put(KafkaSourceConnectorConfig.CONSUMER_AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET_VALUE);
-    opts.put(KafkaSourceConnectorConfig.CONSUMER_GROUP_ID_CONFIG, CONSUMER_GROUP_ID_VALUE);
     opts.put(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_CONFIG, SOURCE_KEY_CONVERTER_VALUE);
     opts.put(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_CONFIG, SOURCE_VALUE_CONVERTER_VALUE);
 

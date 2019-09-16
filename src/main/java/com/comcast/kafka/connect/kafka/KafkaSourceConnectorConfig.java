@@ -134,10 +134,6 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
       + "of this connector on the source cluster";
   public static final Boolean CONSUMER_ENABLE_AUTO_COMMIT_DEFAULT = true;
 
-  public static final String CONSUMER_GROUP_ID_CONFIG = SOURCE_PREFIX.concat(ConsumerConfig.GROUP_ID_CONFIG);
-  public static final String CONSUMER_GROUP_ID_DOC = "Source Kafka Consumer group id. This must be set if source.enable.auto.commit is set as a group id is required for offset tracking on the source cluster";
-  public static final Object CONSUMER_GROUP_ID_DEFAULT = ConfigDef.NO_DEFAULT_VALUE;
-
   public static final String SOURCE_KEY_CONVERTER_CONFIG = "source.key.converter";
   public static final String SOURCE_KEY_CONVERTER_DOC = "";
 
@@ -180,8 +176,6 @@ public class KafkaSourceConnectorConfig extends AbstractConfig {
           Importance.LOW, CONSUMER_VALUE_DESERIALIZER_DOC)
       .define(CONSUMER_ENABLE_AUTO_COMMIT_CONFIG, Type.BOOLEAN, CONSUMER_ENABLE_AUTO_COMMIT_DEFAULT,
           Importance.LOW, CONSUMER_ENABLE_AUTO_COMMIT_DOC)
-      .define(CONSUMER_GROUP_ID_CONFIG, Type.STRING, CONSUMER_GROUP_ID_DEFAULT, new ConfigDef.NonEmptyString(),
-          Importance.MEDIUM, CONSUMER_GROUP_ID_DOC)
       .define(SOURCE_KEY_CONVERTER_CONFIG, Type.STRING,
           Importance.HIGH, SOURCE_KEY_CONVERTER_DOC)
       .define(SOURCE_VALUE_CONVERTER_CONFIG, Type.STRING,

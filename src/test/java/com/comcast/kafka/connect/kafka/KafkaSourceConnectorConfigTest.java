@@ -30,7 +30,6 @@ public class KafkaSourceConnectorConfigTest {
     Map<String, String> map = new HashMap<>();
     map.put(KafkaSourceConnectorConfig.SOURCE_TOPIC_WHITELIST_CONFIG, "test.topic");
     map.put(KafkaSourceConnectorConfig.SOURCE_BOOTSTRAP_SERVERS_CONFIG, "localhost:6000");
-    map.put(KafkaSourceConnectorConfig.CONSUMER_GROUP_ID_CONFIG, "test-consumer-group");
     map.put(KafkaSourceConnectorConfig.SOURCE_KEY_CONVERTER_CONFIG, "org.apache.kafka.connect.storage.StringConverter");
     map.put(KafkaSourceConnectorConfig.SOURCE_VALUE_CONVERTER_CONFIG, "org.apache.kafka.connect.storage.StringConverter");
     defaultMap = Collections.unmodifiableMap(map);
@@ -59,13 +58,6 @@ public class KafkaSourceConnectorConfigTest {
   public void testThrowsWithoutBootstrapServers() {
     Map<String, String> configMap = new HashMap<>(defaultMap);
     configMap.remove(KafkaSourceConnectorConfig.SOURCE_BOOTSTRAP_SERVERS_CONFIG);
-    new KafkaSourceConnectorConfig(configMap);
-  }
-
-  @Test(expected = ConfigException.class)
-  public void testThrowsWithoutConsumerGroup() {
-    Map<String, String> configMap = new HashMap<>(defaultMap);
-    configMap.remove(KafkaSourceConnectorConfig.CONSUMER_GROUP_ID_CONFIG);
     new KafkaSourceConnectorConfig(configMap);
   }
 
